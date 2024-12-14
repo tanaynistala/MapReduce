@@ -39,26 +39,34 @@ ignore_suffixes = [
 # TODO: figure this out
 ignore_pages = ["404_error", "Main_Page", "Hypertext_Transfer_Protocol", "Search"]
 
+
+def remove_control_characters(s):
+    import unicodedata
+
+    return "".join(ch for ch in s if unicodedata.category(ch)[0] != "C")
+
+
 for entry in map(str.rstrip, sys.stdin):
     project_code, page_name, page_views, size = entry.split(" ")
 
-    page_name = page_name.replace("%0A", "")
-    page_name = unquote_plus(page_name)
-    page_name = page_name.replace("_", " ")
+    # Clean page names and remove non-ASCII and control characters
+    page_name = remove_control_characters(unquote_plus(page_name))
 
-    skip = not project_code.startswith("en") or re.match(r"^[A-Z].*", page_name) is None
-
-    for prefix in ignore_prefixes:
-        if page_name.startswith(prefix):
-            skip = True
-            break
-
-    for suffix in ignore_suffixes:
-        if page_name.endswith(suffix):
-            skip = True
-            break
-
-    if skip:
+    # Exclude pages
+    if any(
+        [
+            # Exclude non-English pages
+            not project_code.startswith("en"),
+            # Exclude pages without uppercase initial
+            re.match(r"^[A-Z].*", page_name) is None,
+            # Exclude prefixes
+            any([page_name.startswith(prefix) for prefix in ignore_prefixes]),
+            # Exclude suffixes
+            any([page_name.startswith(suffix) for suffix in ignore_suffixes]),
+            # Exclude boilerplate
+            any([page_name == page for page in ignore_pages]),
+        ]
+    ):
         continue
 
     print(page_name, page_views, sep="\t")
