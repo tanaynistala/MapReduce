@@ -1,0 +1,23 @@
+==> output/map_20160601.tsv <==
+!	5
+!!	1
+!!!	7
+!!!Fuck You!!!	1
+!!!Fuck You!!! and Then Some	1
+!!!Fuck_You!!!	1
+!!!Fuck_You!!!_And_Then_Some	1
+!!!Fuck_You!!!_and_Then_Some	1
+!!!_(Chk_Chk_Chk)	1
+!!!_(album)	1
+
+==> output/map_20160602.tsv <==
+!!!	12
+!!!Fuck_You!!!_and_Then_Some	2
+!!!_(album)	1
+!Alla_tu!	1
+!K7	1
+!K7_Records	1
+!Karas_Region	1
+!Kung	2
+!Kung_language	2
+!Kung_people	2

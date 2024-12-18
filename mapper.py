@@ -36,37 +36,35 @@ ignore_suffixes = [
     ".txt",
 ]
 
-# TODO: figure this out
 ignore_pages = ["404_error", "Main_Page", "Hypertext_Transfer_Protocol", "Search"]
 
+for entry in map(str.strip, sys.stdin):
+    try:
+        project_code, page_name, page_views, size = entry.split()
 
-def remove_control_characters(s):
-    import unicodedata
+        # Exclude pages
+        if any(
+            [
+                # Exclude non-English pages
+                not project_code.startswith("en"),
+                # Exclude pages without uppercase initial
+                all(
+                    [
+                        ord(page_name[0]) < 128,
+                        page_name[0].isalpha(),
+                        page_name[0].islower(),
+                    ]
+                ),
+                # Exclude prefixes
+                any([page_name.startswith(prefix) for prefix in ignore_prefixes]),
+                # Exclude suffixes
+                any([page_name.endswith(suffix) for suffix in ignore_suffixes]),
+                # Exclude boilerplate
+                any([page in page_name for page in ignore_pages]),
+            ]
+        ):
+            continue
 
-    return "".join(ch for ch in s if unicodedata.category(ch)[0] != "C")
-
-
-for entry in map(str.rstrip, sys.stdin):
-    project_code, page_name, page_views, size = entry.split(" ")
-
-    # Clean page names and remove non-ASCII and control characters
-    page_name = remove_control_characters(unquote_plus(page_name))
-
-    # Exclude pages
-    if any(
-        [
-            # Exclude non-English pages
-            not project_code.startswith("en"),
-            # Exclude pages without uppercase initial
-            re.match(r"^[A-Z].*", page_name) is None,
-            # Exclude prefixes
-            any([page_name.startswith(prefix) for prefix in ignore_prefixes]),
-            # Exclude suffixes
-            any([page_name.startswith(suffix) for suffix in ignore_suffixes]),
-            # Exclude boilerplate
-            any([page_name == page for page in ignore_pages]),
-        ]
-    ):
-        continue
-
-    print(page_name, page_views, sep="\t")
+        print(unquote_plus(page_name).replace("\t", ""), page_views, sep="\t")
+    except:
+        print(entry, file=sys.stderr)
